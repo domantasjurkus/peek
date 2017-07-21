@@ -2,7 +2,7 @@
 
 The purpouse of this project is to explore how product manufacturing quality can be ensured using technologies such as computer vision or machine learning. To keep the project withing a manageable scope, the quality of Cooper Software coasters shall be inspected. After an initial investigation into the possible technologies, two methods of carrying out the project emerged.
 
-### Option 1: Computer Vision
+## Option 1: Computer Vision
 
 OpenCV is a handy library that has many tools for image manipulation and analysis.
 
@@ -18,19 +18,19 @@ Possible steps:
 `+` Possibly generalisable to any arbitrary shape/product  
 `-` Alignment/rotation can be tricky/computationally expensive  
 
-OpenCV 3.0 has removed SIFT and SURF operators - those need to be added while rebuilding OpenCV.
+This approach uses an older Opencv 2.4.13.2 (Python 2.7) version which has SIFT and SURF operators part of the core package.
 
 
 
-### Option 2: Machine Learning
+## Option 2: Machine Learning
 
 Tensorflow is a popular machine learning library that has a retrainable model called Inception. The final layer of this model can be adapted to recognise new sets of images.
 
 Steps:
 
-`1` Gather many samples of quality and non-quality coasters  
-`2` Train a model on the sample data (good option: Tensorflow's Inception model)  
-`3` Evaluate the model by passing good/bad coaster images  
+`*` Gather many samples of quality and non-quality coasters  
+`*` Train a model on the sample data (good option: Tensorflow's Inception model)  
+`*` Evaluate the model by passing good/bad coaster images  
 
 `+` Relatively simple implementation  
 `-` Many samples required  
