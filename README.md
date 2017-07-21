@@ -1,8 +1,8 @@
-## CS Sideproject - Manufacturing Quality Assurance
+# CS Sideproject - Manufacturing Quality Assurance
 
 The purpouse of this project is to explore how product manufacturing quality can be ensured using technologies such as computer vision or machine learning. To keep the project withing a manageable scope, the quality of Cooper Software coasters shall be inspected. After an initial investigation into the possible technologies, two methods of carrying out the project emerged.
 
-# Option 1: Computer Vision
+### Option 1: Computer Vision
 
 OpenCV is a handy library that has many tools for image manipulation and analysis.
 
@@ -22,7 +22,7 @@ OpenCV 3.0 has removed SIFT and SURF operators - those need to be added while re
 
 
 
-# Option 2: Machine Learning
+### Option 2: Machine Learning
 
 Tensorflow is a popular machine learning library that has a retrainable model called Inception. The final layer of this model can be adapted to recognise new sets of images.
 
