@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-'''
+''' From docs:
 Feature-based image matching sample.
 
 USAGE
@@ -9,18 +9,21 @@ USAGE
   --feature  - Feature to use. Can be sift, surf of orb. Append '-flann' to feature name
 				to use Flann-based matcher instead bruteforce.
 
-  Press left mouse button on a feature point to see its matching point.
 '''
+
+# Goal: 
+# Input: control and query image
+# Output: aligned and cropped query image
 
 import numpy as np
 import cv2
-#from common import anorm, getsize
+import sys, getopt
 
 FLANN_INDEX_KDTREE = 1  # bug: flann enums are missing
 FLANN_INDEX_LSH    = 6
 
-def init_feature(name):
-	chunks = name.split('-')
+def get_detector_and_matcher(feature_name):
+	chunks = feature_name.split('-')
 	if chunks[0] == 'sift':
 		detector = cv2.SIFT()
 		norm = cv2.NORM_L2
@@ -40,13 +43,15 @@ def init_feature(name):
 							   table_number = 6, # 12
 							   key_size = 12,     # 20
 							   multi_probe_level = 1) #2
-		matcher = cv2.FlannBasedMatcher(flann_params, {})  # bug : need to pass empty dict (#1329)
+		# bug : need to pass empty dict (#1329)
+		matcher = cv2.FlannBasedMatcher(flann_params, {})
 	else:
 		matcher = cv2.BFMatcher(norm)
 	return detector, matcher
 
 
-def filter_matches(kp1, kp2, matches, ratio = 0.75):
+def filter_matches(kp1, kp2, matches, ratio=0.75):
+	# matched key points
 	mkp1, mkp2 = [], []
 	for m in matches:
 		if len(m) == 2 and m[0].distance < m[1].distance * ratio:
@@ -59,7 +64,7 @@ def filter_matches(kp1, kp2, matches, ratio = 0.75):
 	return p1, p2, kp_pairs
 
 
-def explore_match(win, img1, img2, kp_pairs, status = None, H = None):
+def explore_match(window, img1, img2, kp_pairs, status=None, H=None):
 	h1, w1 = img1.shape[:2]
 	h2, w2 = img2.shape[:2]
 	vis = np.zeros((max(h1, h2), w1+w2), np.uint8)
@@ -99,35 +104,17 @@ def explore_match(win, img1, img2, kp_pairs, status = None, H = None):
 		if inlier:
 			cv2.line(vis, (x1, y1), (x2, y2), green)
 
-	cv2.imshow(win, vis)
-	'''def onmouse(event, x, y, flags, param):
-		cur_vis = vis
-		if flags & cv2.EVENT_FLAG_LBUTTON:
-			cur_vis = vis0.copy()
-			r = 8
-			m = (anorm(p1 - (x, y)) < r) | (anorm(p2 - (x, y)) < r)
-			idxs = np.where(m)[0]
-			kp1s, kp2s = [], []
-			for i in idxs:
-				 (x1, y1), (x2, y2) = p1[i], p2[i]
-				 col = (red, green)[status[i]]
-				 cv2.line(cur_vis, (x1, y1), (x2, y2), col)
-				 kp1, kp2 = kp_pairs[i]
-				 kp1s.append(kp1)
-				 kp2s.append(kp2)
-			cur_vis = cv2.drawKeypoints(cur_vis, kp1s, flags=4, color=kp_color)
-			cur_vis[:,w1:] = cv2.drawKeypoints(cur_vis[:,w1:], kp2s, flags=4, color=kp_color)
-
-		cv2.imshow(win, cur_vis)'''
-	#cv2.setMouseCallback(win, onmouse)
+	cv2.imshow(window, vis)
 	return vis
 
 
-def match_and_draw(win):
+def match_and_draw(window):
 	print 'matching...'
 	raw_matches = matcher.knnMatch(desc1, trainDescriptors = desc2, k = 2) #2
 	p1, p2, kp_pairs = filter_matches(kp1, kp2, raw_matches)
 	if len(p1) >= 4:
+		# H: ???
+		# status: ???
 		H, status = cv2.findHomography(p1, p2, cv2.RANSAC, 5.0)
 		print '%d / %d  inliers/matched' % (np.sum(status), len(status))
 	else:
@@ -135,31 +122,28 @@ def match_and_draw(win):
 		print '%d matches found, not enough for homography estimation' % len(p1)
 	
 	print kp_pairs[0]
-	vis = explore_match(win, img1, img2, kp_pairs, status, H)
+	vis = explore_match(window, img1, img2, kp_pairs, status, H)
 
 
-if __name__ == '__main__':
-	print __doc__
-
-	import sys, getopt
+def parse_args():
 	opts, args = getopt.getopt(sys.argv[1:], '', ['feature='])
 	opts = dict(opts)
 	feature_name = opts.get('--feature', 'sift')
-	try: fn1, fn2 = args
+	try:
+		fn1, fn2 = args
 	except:
-		#fn1 = '../c/box.png'
-		#fn2 = '../c/box_in_scene.png'
 		fn1 = 'control.jpg'
 		fn2 = 'rotated.jpg'
+	return fn1, fn2, feature_name
 
+
+if __name__ == '__main__':
+	fn1, fn2, feature_name = parse_args()
 	img1 = cv2.imread(fn1, 0)
 	img2 = cv2.imread(fn2, 0)
-	detector, matcher = init_feature(feature_name)
-	if detector != None:
-		print 'using', feature_name
-	else:
-		print 'unknown feature:', feature_name
-		sys.exit(1)
+
+	detector, matcher = get_detector_and_matcher(feature_name)
+	print 'using', feature_name if detector != None else sys.exit(1)		
 
 	kp1, desc1 = detector.detectAndCompute(img1, None)
 	kp2, desc2 = detector.detectAndCompute(img2, None)
