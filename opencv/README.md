@@ -1,6 +1,6 @@
 ## Computer Vision approach
 
-OpenCV is a handy library that has many tools for image manipulation and analysis.
+This approach uses an older Opencv 2.4.13.2 (Python 2.7) version which has SIFT and SURF operators part of the core package.
 
 Possible steps:
 
@@ -14,4 +14,6 @@ Possible steps:
 `+` Possibly generalisable to any arbitrary shape/product  
 `-` Alignment/rotation can be tricky/computationally expensive  
 
-This approach uses an older Opencv 2.4.13.2 (Python 2.7) version which has SIFT and SURF operators part of the core package.
+####Log
+`27 Jul`  
+Found a good example of SIFT, added it in `find_obj`  
