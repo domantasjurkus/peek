@@ -14,6 +14,7 @@ Possible steps:
 `+` Possibly generalisable to any arbitrary shape/product  
 `-` Alignment/rotation can be tricky/computationally expensive  
 
-####Log
+
+#### Log
 `27 Jul`  
 Found a good example of SIFT, added it in `find_obj`  
