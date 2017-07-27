@@ -1,54 +1,6 @@
 # CS Sideproject - Manufacturing Quality Assurance
 
-The purpouse of this project is to explore how product manufacturing quality can be ensured using technologies such as computer vision or machine learning. To keep the project withing a manageable scope, the quality of Cooper Software coasters shall be inspected. After an initial investigation into the possible technologies, two methods of carrying out the project emerged.
+The purpouse of this project is to explore how product manufacturing quality can be ensured. To keep the project withing a manageable scope, the quality of Cooper Software coasters shall be inspected. After an initial investigation into the possible technologies, two methods of carrying out the project emerged: using computer vision and/or machine learning.  
 
-## Option 1: Computer Vision
-
-OpenCV is a handy library that has many tools for image manipulation and analysis.
-
-Possible steps:
-
-`*` Detect scale-invariant features (SIFT) of a sample control coaster and a target coaster  
-`*` Align both coasters  
-`*` Calculate edge difference  
-`*` Smooth differnece in case alignment is not optimal  
-`*` Represent edge diference in a numerical format  
-
-`+` Single test sample required  
-`+` Possibly generalisable to any arbitrary shape/product  
-`-` Alignment/rotation can be tricky/computationally expensive  
-
-This approach uses an older Opencv 2.4.13.2 (Python 2.7) version which has SIFT and SURF operators part of the core package.
-
-
-
-## Option 2: Machine Learning
-
-Tensorflow is a popular machine learning library that has a retrainable model called Inception. The final layer of this model can be adapted to recognise new sets of images.
-
-Steps:
-
-`*` Gather many samples of quality and non-quality coasters  
-`*` Train a model on the sample data (good option: Tensorflow's Inception model)  
-`*` Evaluate the model by passing good/bad coaster images  
-
-`+` Relatively simple implementation  
-`-` Many samples required  
-`-` Reliance on a complex model  
-`-` Need to provide many *bad* examples  
-
-Investigation 1:
-The model was trained with 77 good and 48 bad examples with some variation in background, lighting and positioning of the coaster. Damaged costers had some parts covered by a blank piece of paper, emulating a missing shape or contour.
-
-Running the classifier on images of unseen damaged coasters, it was able to identify 4 out of 5 correctly. The mis-identified coaster did not have any obvious difference for other damaged smaples
-
-```
-damaged/01.jpg bad (score = 0.97133) good (score = 0.02867)
-damaged/02.jpg bad (score = 0.87462) good (score = 0.12538)
-damaged/03.jpg bad (score = 0.83371) good (score = 0.16629)
-damaged/04.jpg bad (score = 0.94451) good (score = 0.05549)
-damaged/05.jpg good (score = 0.76480) bad (score = 0.23520)
-
-```
-
-This accuracy can be further improved with more traning samples. The model does not mis-identify good coasters that were not part of the training data.
+The computer vision approad can be found in `opencv`.  
+The machine learning approad is currently gitignored due to the large directory size.
