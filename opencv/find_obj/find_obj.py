@@ -64,7 +64,7 @@ def filter_matches(kp1, kp2, matches, ratio=0.75):
 	return p1, p2, kp_pairs
 
 
-def explore_match(window, img1, img2, kp_pairs, status=None, H=None):
+def draw_match(window, img1, img2, kp_pairs, status=None, H=None):
 	h1, w1 = img1.shape[:2]
 	h2, w2 = img2.shape[:2]
 	vis = np.zeros((max(h1, h2), w1+w2), np.uint8)
@@ -103,9 +103,7 @@ def explore_match(window, img1, img2, kp_pairs, status=None, H=None):
 	for (x1, y1), (x2, y2), inlier in zip(p1, p2, status):
 		if inlier:
 			cv2.line(vis, (x1, y1), (x2, y2), green)
-
 	cv2.imshow(window, vis)
-	return vis
 
 
 def match_and_draw(window):
@@ -122,7 +120,7 @@ def match_and_draw(window):
 		print '%d matches found, not enough for homography estimation' % len(p1)
 	
 	print kp_pairs[0]
-	vis = explore_match(window, img1, img2, kp_pairs, status, H)
+	draw_match(window, img1, img2, kp_pairs, status, H)
 
 
 def parse_args():
@@ -147,7 +145,8 @@ if __name__ == '__main__':
 
 	kp1, desc1 = detector.detectAndCompute(img1, None)
 	kp2, desc2 = detector.detectAndCompute(img2, None)
-	print 'img1 - %d features, img2 - %d features' % (len(kp1), len(kp2))
+	print "img1 - %d features" % len(kp1)
+	print "img2 - %d features" % len(kp2)
 
 	match_and_draw('find_obj')
 	cv2.waitKey()
