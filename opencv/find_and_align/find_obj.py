@@ -112,8 +112,6 @@ def draw_match(window, img1, img2, kp_pairs, status=None, H=None):
 		else:
 			draw_cross(vis, x1, x2, y1, y2, 2, red, 3)
 	
-	print len(vis), len(vis[0]), len(vis[0][0]), vis[0][0][0]
-	print len(corners), len(corners[0]), len(corners[0][0])
 	display_image("original", vis)
 	display_image("aligned", warp)
 

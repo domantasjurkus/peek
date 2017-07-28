@@ -18,4 +18,6 @@ This approach uses an older Opencv 2.4.13.2 (Python 2.7) version which has SIFT 
 Found a good example of SIFT, added it in `find_and_align`  
 
 `28 Jul`  
-Cleanup, move old scripts into `old`. Attempt to crop the image after feature detection.
+Cleanup, move old scripts into `old`.  
+Tried comparing the SIFT and SURF matchers - no significant difference was apparent.  
+The query coaster is found in the query image - now need to crop out and align the coaster with the sample image.
