@@ -17,7 +17,7 @@ Possible steps:
 
 #### Log
 `27 Jul`  
-
 Found a good example of SIFT, added it in `find_and_align`  
+
 `28 Jul`  
 Cleanup, move old scripts into `old`
