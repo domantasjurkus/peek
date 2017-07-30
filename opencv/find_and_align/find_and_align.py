@@ -15,34 +15,34 @@ FLANN_INDEX_KDTREE = 1  # bug: flann enums are missing
 FLANN_INDEX_LSH    = 6
 
 def parse_args():
-	opts, args = getopt.getopt(sys.argv[1:], '', ['feature='])
+	opts, args = getopt.getopt(sys.argv[1:], "", ["feature="])
 	opts = dict(opts)
-	#feature_name = opts.get('--feature', 'surf')
-	feature_name = opts.get('--feature', 'sift')
+	#feature_name = opts.get("--feature", "surf")
+	feature_name = opts.get("--feature", "sift")
 	try:
 		fn1, fn2 = args
 	except:
-		fn1 = 'control.jpg'
-		fn2 = 'damaged.jpg'
+		fn1 = "control.jpg"
+		fn2 = "damaged.jpg"
 	return fn1, fn2, feature_name
 
 
 def get_detector_and_matcher(feature_name):
-	chunks = feature_name.split('-')
-	if chunks[0] == 'sift':
+	chunks = feature_name.split("-")
+	if chunks[0] == "sift":
 		detector = cv2.SIFT()
 		norm = cv2.NORM_L2
-	elif chunks[0] == 'surf':
+	elif chunks[0] == "surf":
 		detector = cv2.SURF(800)
 		norm = cv2.NORM_L2
-	elif chunks[0] == 'orb':
+	elif chunks[0] == "orb":
 		detector = cv2.ORB(400)
 		norm = cv2.NORM_HAMMING
 	else:
 		detector = cv2.SIFT()
 		norm = cv2.NORM_L2
 
-	if 'flann' in chunks:
+	if "flann" in chunks:
 		if norm == cv2.NORM_L2:
 			flann_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
 		else:
@@ -71,8 +71,9 @@ def filter_matches(kp1, kp2, matches, ratio=0.75):
 	return p1, p2, kp_pairs
 
 
-def find_in_query_image(img_control, img_query):
-	# WORK IN PROGRESS
+def get_warped_image(img_control, img_query, corners):
+	"""Find img_query in img_control"""
+
 	# Determine topleft,topright,bottomright,bottomleft corners
 	points = corners.reshape(4,2)
 	query_rectangle = get_corners(points)
@@ -84,17 +85,20 @@ def find_in_query_image(img_control, img_query):
 		[0, 0],
 		[max_width-1, 0],
 		[max_width-1, max_height-1],
-		[0, max_height-1]], dtype="float32")
+		[0, max_height-1]],dtype="float32")
 
 	# Calculate the perspective transform matrix
 	M = cv2.getPerspectiveTransform(query_rectangle, dst)
 
 	# Warp the perspective to grab the screen
-	warp = cv2.warpPerspective(img_query, M, (max_width, max_height))
-	cv2.imshow("image", warp)
+	return cv2.warpPerspective(img_query, M, (max_width, max_height))
 
 
-if __name__ == '__main__':
+def save_image(image, path="../aligned.jpg"):
+	cv2.imwrite(path, image);
+
+
+if __name__ == "__main__":
 	fn1, fn2, feature_name = parse_args()
 	img_control = cv2.imread(fn1, 0)
 	img_query = cv2.imread(fn2, 0)
@@ -111,10 +115,10 @@ if __name__ == '__main__':
 		print "Not enough matches found"
 		exit()
 	
+	H, status = cv2.findHomography(p1, p2, cv2.RANSAC, 5.0)
 	# H - 3x3 transformation matrix (homography)
 	# status - [0,1] vector of ???
-	H, status = cv2.findHomography(p1, p2, cv2.RANSAC, 5.0)
-	#print '%d / %d  inliers/matched' % (np.sum(status), len(status))
+	#print "%d / %d  inliers/matched" % (np.sum(status), len(status))
 
 	if H is None:
 		print "Homography could not be found"
@@ -122,16 +126,15 @@ if __name__ == '__main__':
 
 	h1, w1 = img_control.shape[:2]
 	h2, w2 = img_query.shape[:2]
-	img_combine = np.zeros((max(h1, h2), w1+w2), np.uint8)
-	img_combine[:h1, :w1] = img_control
-	img_combine[:h2, w1:w1+w2] = img_query
-	img_combine = cv2.cvtColor(img_combine, cv2.COLOR_GRAY2BGR)
 
 	blank_array = np.float32([[0,0], [w1,0], [w1,h1], [0,h1]]).reshape(2,-1,2)
 	corners = cv2.perspectiveTransform(blank_array, H)
 
 	draw_traces(img_control, img_query, kp_pairs, corners, status)
-	find_in_query_image(img_control, img_query)
+
+	warp = get_warped_image(img_control, img_query, corners)
+	cv2.imshow("image", warp)
+	save_image(warp)
 
 	cv2.waitKey(0)
 	cv2.destroyAllWindows()

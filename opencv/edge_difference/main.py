@@ -18,7 +18,10 @@ def get_edge_image_difference(diff_image):
 
 # Read images in grayscale
 control =  cv2.imread("control.jpg", 0);
-damaged =  cv2.imread("damaged.jpg", 0);
+damaged =  cv2.imread("aligned.jpg", 0);
+#control =  cv2.imread("main.jpg", 0);
+#damaged =  cv2.imread("damaged.jpg", 0);
+
 
 edges_control = cv2.Canny(control, 50, 50)
 edges_damaged = cv2.Canny(damaged, 50, 50)
