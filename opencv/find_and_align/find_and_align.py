@@ -8,24 +8,11 @@ import numpy as np
 import cv2
 import sys, getopt
 
-from draw import *
-from util import *
+import util
+import draw
 
 FLANN_INDEX_KDTREE = 1  # bug: flann enums are missing
 FLANN_INDEX_LSH    = 6
-
-def parse_args():
-	opts, args = getopt.getopt(sys.argv[1:], "", ["feature="])
-	opts = dict(opts)
-	#feature_name = opts.get("--feature", "surf")
-	feature_name = opts.get("--feature", "sift")
-	try:
-		fn1, fn2 = args
-	except:
-		fn1 = "control.jpg"
-		fn2 = "damaged.jpg"
-	return fn1, fn2, feature_name
-
 
 def get_detector_and_matcher(feature_name):
 	chunks = feature_name.split("-")
@@ -73,23 +60,17 @@ def filter_matches(kp1, kp2, matches, ratio=0.75):
 
 def get_warped_image(img_control, img_query, corners):
 	# Determine topleft,topright,bottomright,bottomleft corners
-	points = corners.reshape(4,2)
-	query_rectangle = get_corners(points)
-	max_height, max_width = img_control.shape[:2]
+	query_rectangle = util.get_corners(corners.reshape(4,2))
+	max_h, max_w = img_control.shape[:2]
 
-	# Create a destination array to
-	# map the screen to a top-down, "birds eye" view
-	dst = np.array([
+	empty_array = np.array([
 		[0, 0],
-		[max_width-1, 0],
-		[max_width-1, max_height-1],
-		[0, max_height-1]],dtype="float32")
+		[max_w-1, 0],
+		[max_w-1, max_h-1],
+		[0, max_h-1]], dtype="float32")
 
-	# Calculate the perspective transform matrix
-	M = cv2.getPerspectiveTransform(query_rectangle, dst)
-
-	# Warp the perspective to grab the screen
-	return cv2.warpPerspective(img_query, M, (max_width, max_height))
+	transform_matrix = cv2.getPerspectiveTransform(query_rectangle, empty_array)
+	return cv2.warpPerspective(img_query, transform_matrix, (max_w, max_h))
 
 
 def save_image(image, path="../aligned.jpg"):
@@ -97,41 +78,53 @@ def save_image(image, path="../aligned.jpg"):
 
 
 if __name__ == "__main__":
-	fn1, fn2, feature_name = parse_args()
+	fn1 = "control.jpg"
+	fn2 = "damaged.jpg"
 	img_control = cv2.imread(fn1, 0)
 	img_query = cv2.imread(fn2, 0)
 
+	features = ["sift", "surf"]
+	feature_name = features[0]
 	detector, matcher = get_detector_and_matcher(feature_name)
 
+	# Find keypoints and descriptors
 	kp1, desc1 = detector.detectAndCompute(img_control, None)
 	kp2, desc2 = detector.detectAndCompute(img_query, None)
 
-	raw_matches = matcher.knnMatch(desc1, trainDescriptors=desc2, k=2) #2
+	# Find keypoints that match between the two images
+	raw_matches = matcher.knnMatch(desc1, trainDescriptors=desc2, k=2)
+
+	# Filter out weak matches
 	p1, p2, kp_pairs = filter_matches(kp1, kp2, raw_matches)
 
 	if len(p1) < 4:
-		print "Not enough matches found"
+		print "Not enough strong matches found"
 		exit()
 	
-	H, status = cv2.findHomography(p1, p2, cv2.RANSAC, 5.0)
-	# H - 3x3 transformation matrix (homography)
+	# Find the transformation homography
+	# H - 3x3 transformation matrix
 	# status - [0,1] vector of ???
+	# Basic idea: img1 = H*img2
+	H, status = cv2.findHomography(p1, p2, cv2.RANSAC, 5.0)
 	#print "%d / %d  inliers/matched" % (np.sum(status), len(status))
 
 	if H is None:
 		print "Homography could not be found"
 		exit()
 
+	# Extract corners in the query image
 	h1, w1 = img_control.shape[:2]
 	h2, w2 = img_query.shape[:2]
-
 	blank_array = np.float32([[0,0], [w1,0], [w1,h1], [0,h1]]).reshape(2,-1,2)
 	corners = cv2.perspectiveTransform(blank_array, H)
 
-	draw_traces(img_control, img_query, kp_pairs, corners, status)
+	# Draw matching keypoint pairs for debugging
+	draw.draw_traces(img_control, img_query, kp_pairs, corners, status)
 
 	warp = get_warped_image(img_control, img_query, corners)
 	cv2.imshow("image", warp)
+
+	# Save/Return the image to the caller
 	save_image(warp)
 
 	cv2.waitKey(0)
