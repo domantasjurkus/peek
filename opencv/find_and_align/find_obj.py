@@ -18,7 +18,9 @@ USAGE
 import numpy as np
 import cv2
 import sys, getopt
+
 from draw import *
+from util import *
 
 FLANN_INDEX_KDTREE = 1  # bug: flann enums are missing
 FLANN_INDEX_LSH    = 6
@@ -90,9 +92,36 @@ def draw_match(window, img1, img2, kp_pairs, status=None):
 	img_compare[:h2, w1:w1+w2] = img2
 	img_compare = cv2.cvtColor(img_compare, cv2.COLOR_GRAY2BGR)
 
-	blank_array = np.float32([[0, 0], [w1, 0], [w1, h1], [0, h1]]).reshape(2, -1, 2)
+	blank_array = np.float32([[0,0], [w1,0], [w1,h1], [0,h1]]).reshape(2,-1,2)
 	corners = cv2.perspectiveTransform(blank_array, H)
-	print corners
+	
+	# TODO
+	#---------------
+	# Determine topleft,topright,bottomright,bottomleft corners
+	points = corners.reshape(4,2)
+	query_rectangle = get_corners(points)
+	print query_rectangle
+	max_width, max_height = get_width_height(query_rectangle)
+	print max_width, max_height
+
+	# Create a destination array to
+	# map the screen to a top-down, "birds eye" view
+	dst = np.array([
+		[0, 0],
+		[max_width-1, 0],
+		[max_width-1, max_height-1],
+		[0, max_height-1]], dtype="float32")
+
+	# Calculate the perspective transform matrix
+	M = cv2.getPerspectiveTransform(query_rectangle, dst)
+
+	# Warp the perspective to grab the screen
+	warp = cv2.warpPerspective(img2, M, (max_width, max_height))
+
+	cv2.imshow("image", warp)
+	cv2.waitKey(0)
+
+	#---------------
 
 	warp = cv2.warpPerspective(img_compare, H, (w1, h1))
 
