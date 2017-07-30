@@ -1,19 +1,8 @@
 #!/usr/bin/env python
 
-''' From docs:
-Feature-based image matching sample.
-
-USAGE
-  find_obj.py [--feature=<sift|surf|orb>[-flann]] [ <image1> <image2> ]
-
-  --feature  - Feature to use. Can be sift, surf of orb. Append '-flann' to feature name
-				to use Flann-based matcher instead bruteforce.
-
-'''
-
 # Goal: 
 # Input: control and query image
-# Output: aligned and cropped query image
+# Output: aligned query image
 
 import numpy as np
 import cv2
@@ -34,7 +23,7 @@ def parse_args():
 		fn1, fn2 = args
 	except:
 		fn1 = 'control.jpg'
-		fn2 = 'rotated.jpg'
+		fn2 = 'damaged.jpg'
 	return fn1, fn2, feature_name
 
 
@@ -65,8 +54,6 @@ def get_detector_and_matcher(feature_name):
 		matcher = cv2.FlannBasedMatcher(flann_params, {})
 	else:
 		matcher = cv2.BFMatcher(norm)
-	#print "Detector:", detector
-	#print "Matcher:", matcher
 	return detector, matcher
 
 
@@ -84,25 +71,12 @@ def filter_matches(kp1, kp2, matches, ratio=0.75):
 	return p1, p2, kp_pairs
 
 
-def draw_match(window, img1, img2, kp_pairs, status=None):
-	h1, w1 = img1.shape[:2]
-	h2, w2 = img2.shape[:2]
-	img_compare = np.zeros((max(h1, h2), w1+w2), np.uint8)
-	img_compare[:h1, :w1] = img1
-	img_compare[:h2, w1:w1+w2] = img2
-	img_compare = cv2.cvtColor(img_compare, cv2.COLOR_GRAY2BGR)
-
-	blank_array = np.float32([[0,0], [w1,0], [w1,h1], [0,h1]]).reshape(2,-1,2)
-	corners = cv2.perspectiveTransform(blank_array, H)
-	
-	# TODO
-	#---------------
+def find_in_query_image(img_control, img_query):
+	# WORK IN PROGRESS
 	# Determine topleft,topright,bottomright,bottomleft corners
 	points = corners.reshape(4,2)
 	query_rectangle = get_corners(points)
-	print query_rectangle
-	max_width, max_height = get_width_height(query_rectangle)
-	print max_width, max_height
+	max_height, max_width = img_control.shape[:2]
 
 	# Create a destination array to
 	# map the screen to a top-down, "birds eye" view
@@ -116,57 +90,48 @@ def draw_match(window, img1, img2, kp_pairs, status=None):
 	M = cv2.getPerspectiveTransform(query_rectangle, dst)
 
 	# Warp the perspective to grab the screen
-	warp = cv2.warpPerspective(img2, M, (max_width, max_height))
-
-	#---------------
-
-	offset_corners = np.int32(corners.reshape(-1, 2) + (w1, 0))
-	draw_match_rect(img_compare, [offset_corners])
-
-	if status is None:
-		status = np.ones(len(kp_pairs), np.bool_)
-	p1 = np.int32([kpp[0].pt for kpp in kp_pairs])
-	p2 = np.int32([kpp[1].pt for kpp in kp_pairs]) + (w1, 0)
-
-	# Draw inliers (if successfully found the object)
-	# or matching keypoints (if failed)
-	for (x1, y1), (x2, y2), inlier in zip(p1, p2, status):
-		if inlier:
-			draw_match_line(img_compare, x1, x2, y1, y2, 2)
-		else:
-			draw_cross(img_compare, x1, x2, y1, y2, 2)
-	
-	cv2.imshow("original", img_compare)
+	warp = cv2.warpPerspective(img_query, M, (max_width, max_height))
 	cv2.imshow("image", warp)
-	cv2.waitKey(0)
 
 
 if __name__ == '__main__':
 	fn1, fn2, feature_name = parse_args()
-	img1 = cv2.imread(fn1, 0)
-	img2 = cv2.imread(fn2, 0)
-	#print feature_name
+	img_control = cv2.imread(fn1, 0)
+	img_query = cv2.imread(fn2, 0)
 
 	detector, matcher = get_detector_and_matcher(feature_name)
 
-	kp1, desc1 = detector.detectAndCompute(img1, None)
-	kp2, desc2 = detector.detectAndCompute(img2, None)
-	#print "img1 - %d features" % len(kp1)
-	#print "img2 - %d features" % len(kp2)
+	kp1, desc1 = detector.detectAndCompute(img_control, None)
+	kp2, desc2 = detector.detectAndCompute(img_query, None)
 
 	raw_matches = matcher.knnMatch(desc1, trainDescriptors=desc2, k=2) #2
 	p1, p2, kp_pairs = filter_matches(kp1, kp2, raw_matches)
-	if len(p1) >= 4:
-		# H - 3x3 transformation matrix (homography)
-		# status - [0,1] vector of ???
-		H, status = cv2.findHomography(p1, p2, cv2.RANSAC, 5.0)
-		#print '%d / %d  inliers/matched' % (np.sum(status), len(status))
-	else:
-		H, status = None, None
-		#print '%d matches found, not enough for homography estimation' % len(p1)
 
-	if H is not None:
-		draw_match("find_obj", img1, img2, kp_pairs, status)
+	if len(p1) < 4:
+		print "Not enough matches found"
+		exit()
+	
+	# H - 3x3 transformation matrix (homography)
+	# status - [0,1] vector of ???
+	H, status = cv2.findHomography(p1, p2, cv2.RANSAC, 5.0)
+	#print '%d / %d  inliers/matched' % (np.sum(status), len(status))
 
-	cv2.waitKey()
+	if H is None:
+		print "Homography could not be found"
+		exit()
+
+	h1, w1 = img_control.shape[:2]
+	h2, w2 = img_query.shape[:2]
+	img_combine = np.zeros((max(h1, h2), w1+w2), np.uint8)
+	img_combine[:h1, :w1] = img_control
+	img_combine[:h2, w1:w1+w2] = img_query
+	img_combine = cv2.cvtColor(img_combine, cv2.COLOR_GRAY2BGR)
+
+	blank_array = np.float32([[0,0], [w1,0], [w1,h1], [0,h1]]).reshape(2,-1,2)
+	corners = cv2.perspectiveTransform(blank_array, H)
+
+	draw_traces(img_control, img_query, kp_pairs, corners, status)
+	find_in_query_image(img_control, img_query)
+
+	cv2.waitKey(0)
 	cv2.destroyAllWindows()
