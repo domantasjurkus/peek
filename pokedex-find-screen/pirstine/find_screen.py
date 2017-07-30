@@ -9,14 +9,16 @@ import argparse
 import cv2
 
 # construct the argument parser and parse the arguments
-ap = argparse.ArgumentParser()
+'''ap = argparse.ArgumentParser()
 ap.add_argument("-q", "--query", required = True,
 	help = "Path to the query image")
-args = vars(ap.parse_args())
+args = vars(ap.parse_args())'''
 
 # load the query image, compute the ratio of the old height
 # to the new height, clone it, and resize it
-image = cv2.imread(args["query"])
+#image = cv2.imread(args["query"])
+#image = cv2.imread("queries/query_marowak.jpg")
+image = cv2.imread("../screen.jpg")
 ratio = image.shape[0] / 300.0
 orig = image.copy()
 image = imutils.resize(image, height = 300)
@@ -29,7 +31,7 @@ edged = cv2.Canny(gray, 30, 200)
 
 # find contours in the edged image, keep only the largest
 # ones, and initialize our screen contour
-(cnts, _) = cv2.findContours(edged.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+(unused, cnts, _) = cv2.findContours(edged.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 cnts = sorted(cnts, key = cv2.contourArea, reverse = True)[:10]
 screenCnt = None
 
@@ -114,8 +116,8 @@ crop = warp[10:dY, w - dX:w - 10]
 cv2.imwrite("cropped.png", crop)
 
 # show our images
-cv2.imshow("image", image)
-cv2.imshow("edge", edged)
+#cv2.imshow("image", image)
+#cv2.imshow("edge", edged)
 cv2.imshow("warp", imutils.resize(warp, height = 300))
 cv2.imshow("crop", imutils.resize(crop, height = 300))
 cv2.waitKey(0)

@@ -56,3 +56,12 @@ def resize(image, width = None, height = None, inter = cv2.INTER_AREA):
 
 	# return the resized image
 	return resized
+
+def show_image(image_array):
+	cv2.namedWindow("window")
+	while(1):
+		cv2.imshow("window", image_array)
+		k = cv2.waitKey(1) & 0xFF
+		if k == 27:
+			break
+	cv2.destroyAllWindows()
