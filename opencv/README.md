@@ -23,4 +23,4 @@ Tried comparing the SIFT and SURF matchers - no significant difference was appar
 The query coaster is found in the query image - now need to crop out and align the coaster with the sample image.
 
 `30 Jul`
-Will go through the `pokedex-find-screen` tutorial in order to understand how to create a top-down view of a fragment of an image.
+Updated `find_and_align` to warp the query coaster to be aligned with the control coaster. Current approach assumes that the angle is no bigger than a few degrees, otherwise the detected coasted may be flipped.

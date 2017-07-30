@@ -1,10 +1,5 @@
 import numpy as np
 
-def show_image(image_array):
-	cv2.namedWindow("window")
-	cv2.imshow("window", image_array)
-	cv2.waitKey(0)
-
 # Input: array of 4 coordinates [x,y]
 # Returns: [top-left,top-right,bottom-right,bottom-left]
 def get_corners(points):

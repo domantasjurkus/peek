@@ -118,12 +118,7 @@ def draw_match(window, img1, img2, kp_pairs, status=None):
 	# Warp the perspective to grab the screen
 	warp = cv2.warpPerspective(img2, M, (max_width, max_height))
 
-	cv2.imshow("image", warp)
-	cv2.waitKey(0)
-
 	#---------------
-
-	warp = cv2.warpPerspective(img_compare, H, (w1, h1))
 
 	offset_corners = np.int32(corners.reshape(-1, 2) + (w1, 0))
 	draw_match_rect(img_compare, [offset_corners])
@@ -141,8 +136,9 @@ def draw_match(window, img1, img2, kp_pairs, status=None):
 		else:
 			draw_cross(img_compare, x1, x2, y1, y2, 2)
 	
-	display_image("original", img_compare)
-	display_image("aligned", warp)
+	cv2.imshow("original", img_compare)
+	cv2.imshow("image", warp)
+	cv2.waitKey(0)
 
 
 if __name__ == '__main__':

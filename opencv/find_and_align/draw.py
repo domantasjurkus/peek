@@ -16,7 +16,3 @@ def draw_cross(image, x1, x2, y1, y2, r, color=(0,0,255), thickness=3):
 	cv2.line(image, (x1-r, y1+r), (x1+r, y1-r), color, thickness)
 	cv2.line(image, (x2-r, y2-r), (x2+r, y2+r), color, thickness)
 	cv2.line(image, (x2-r, y2+r), (x2+r, y2-r), color, thickness)
-
-
-def display_image(window_name, image_array):
-	cv2.imshow(window_name, image_array)
