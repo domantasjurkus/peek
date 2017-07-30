@@ -22,7 +22,7 @@ Cleanup, move old scripts into `old`.
 Tried comparing the SIFT and SURF matchers - no significant difference was apparent.  
 The query coaster is found in the query image - now need to crop out and align the coaster with the sample image.
 
-`30 Jul`
+`30 Jul`  
 Updated `find_and_align` to warp the query coaster to be aligned with the control coaster. Current approach assumes that the angle is no bigger than a few degrees, otherwise the detected coasted may be flipped.
 
 Initial comparison using Canny edge detection picks up a lot of noise that is not actual 'damage' to the product. Will need to adjust the thresholds or consider another method of comparison

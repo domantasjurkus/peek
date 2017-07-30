@@ -72,8 +72,6 @@ def filter_matches(kp1, kp2, matches, ratio=0.75):
 
 
 def get_warped_image(img_control, img_query, corners):
-	"""Find img_query in img_control"""
-
 	# Determine topleft,topright,bottomright,bottomleft corners
 	points = corners.reshape(4,2)
 	query_rectangle = get_corners(points)
