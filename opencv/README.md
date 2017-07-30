@@ -13,7 +13,7 @@ This approach uses an older Opencv 2.4.13.2 (Python 2.7) version which has SIFT 
 `-` Alignment/rotation can be tricky/computationally expensive  
 
 
-#### Log
+#### Log `2017`
 `27 Jul`  
 Found a good example of SIFT, added it in `find_and_align`  
 
@@ -21,3 +21,6 @@ Found a good example of SIFT, added it in `find_and_align`
 Cleanup, move old scripts into `old`.  
 Tried comparing the SIFT and SURF matchers - no significant difference was apparent.  
 The query coaster is found in the query image - now need to crop out and align the coaster with the sample image.
+
+`30 Jul`
+Will go through the `pokedex-find-screen` tutorial in order to understand how to create a top-down view of a fragment of an image.
