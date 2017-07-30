@@ -18,7 +18,7 @@ USAGE
 import numpy as np
 import cv2
 import sys, getopt
-import draw
+from draw import *
 
 FLANN_INDEX_KDTREE = 1  # bug: flann enums are missing
 FLANN_INDEX_LSH    = 6
@@ -82,18 +82,38 @@ def filter_matches(kp1, kp2, matches, ratio=0.75):
 	return p1, p2, kp_pairs
 
 
-def match_and_draw(window):
-	raw_matches = matcher.knnMatch(desc1, trainDescriptors=desc2, k=2) #2
-	p1, p2, kp_pairs = filter_matches(kp1, kp2, raw_matches)
-	if len(p1) >= 4:
-		# H - 3x3 transformation matrix (homography)
-		# status - [0,1] vector of ???
-		H, status = cv2.findHomography(p1, p2, cv2.RANSAC, 5.0)
-		#print '%d / %d  inliers/matched' % (np.sum(status), len(status))
-	else:
-		H, status = None, None
-		#print '%d matches found, not enough for homography estimation' % len(p1)
-	draw.draw_match(window, img1, img2, kp_pairs, status, H)
+def draw_match(window, img1, img2, kp_pairs, status=None):
+	h1, w1 = img1.shape[:2]
+	h2, w2 = img2.shape[:2]
+	img_compare = np.zeros((max(h1, h2), w1+w2), np.uint8)
+	img_compare[:h1, :w1] = img1
+	img_compare[:h2, w1:w1+w2] = img2
+	img_compare = cv2.cvtColor(img_compare, cv2.COLOR_GRAY2BGR)
+
+	blank_array = np.float32([[0, 0], [w1, 0], [w1, h1], [0, h1]]).reshape(2, -1, 2)
+	corners = cv2.perspectiveTransform(blank_array, H)
+	print corners
+
+	warp = cv2.warpPerspective(img_compare, H, (w1, h1))
+
+	offset_corners = np.int32(corners.reshape(-1, 2) + (w1, 0))
+	draw_match_rect(img_compare, [offset_corners])
+
+	if status is None:
+		status = np.ones(len(kp_pairs), np.bool_)
+	p1 = np.int32([kpp[0].pt for kpp in kp_pairs])
+	p2 = np.int32([kpp[1].pt for kpp in kp_pairs]) + (w1, 0)
+
+	# Draw inliers (if successfully found the object)
+	# or matching keypoints (if failed)
+	for (x1, y1), (x2, y2), inlier in zip(p1, p2, status):
+		if inlier:
+			draw_match_line(img_compare, x1, x2, y1, y2, 2)
+		else:
+			draw_cross(img_compare, x1, x2, y1, y2, 2)
+	
+	display_image("original", img_compare)
+	display_image("aligned", warp)
 
 
 if __name__ == '__main__':
@@ -109,7 +129,19 @@ if __name__ == '__main__':
 	#print "img1 - %d features" % len(kp1)
 	#print "img2 - %d features" % len(kp2)
 
-	match_and_draw('find_obj')
+	raw_matches = matcher.knnMatch(desc1, trainDescriptors=desc2, k=2) #2
+	p1, p2, kp_pairs = filter_matches(kp1, kp2, raw_matches)
+	if len(p1) >= 4:
+		# H - 3x3 transformation matrix (homography)
+		# status - [0,1] vector of ???
+		H, status = cv2.findHomography(p1, p2, cv2.RANSAC, 5.0)
+		#print '%d / %d  inliers/matched' % (np.sum(status), len(status))
+	else:
+		H, status = None, None
+		#print '%d matches found, not enough for homography estimation' % len(p1)
+
+	if H is not None:
+		draw_match("find_obj", img1, img2, kp_pairs, status)
 
 	cv2.waitKey()
 	cv2.destroyAllWindows()
