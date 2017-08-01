@@ -79,7 +79,7 @@ def save_image(image, path="../aligned.jpg"):
 
 if __name__ == "__main__":
 	fn1 = "control.jpg"
-	fn2 = "damaged.jpg"
+	fn2 = "rotated.jpg"
 	img_control = cv2.imread(fn1, 0)
 	img_query = cv2.imread(fn2, 0)
 
