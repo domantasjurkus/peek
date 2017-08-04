@@ -110,17 +110,17 @@ def get_warped_image(img_control, img_query):
 	corners = cv2.perspectiveTransform(blank_array, H)
 
 	# Draw matching keypoint pairs for debugging
-	draw.draw_traces(img_control, img_query, kp_pairs, corners, status)
+	#draw.draw_traces(img_control, img_query, kp_pairs, corners, status)
 
 	warped = compute_perspective(img_control, img_query, corners)
 	return warped
 
 
 if __name__ == "__main__":
-	fn1 = "control.jpg"
-	fn2 = "rotated.jpg"
-	img_control = cv2.imread(fn1, 0)
-	img_query = cv2.imread(fn2, 0)
+	control_path = "../img/control.jpg"
+	query_path = "../img/damaged_pen.jpg"
+	img_control = cv2.imread(control_path, 0)
+	img_query = cv2.imread(query_path, 0)
 	
 	warped_image = get_warped_image(img_control, img_query)
 	#cv2.imwrite("../aligned.jpg", warped_image);

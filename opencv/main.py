@@ -1,4 +1,5 @@
 import cv2
+from find_and_align import find_and_align
 '''(Intended) Usage:
 $ python main.py control_image query_image
 
@@ -14,9 +15,21 @@ $ python main.py control_image query_image
 
 
 def main():
-	pass
 	# Import control and query images
-	# Get the warped control image from query image
+	control_path = "img/control.jpg"
+	query_path = "img/damaged_pen.jpg"
+	img_control = cv2.imread(control_path, 0)
+	img_query = cv2.imread(query_path, 0)
+
+	# Align query image
+	img_query = find_and_align.get_warped_image(img_control, img_query)
+	
+	cv2.imshow("control", img_control)
+	cv2.imshow("query", img_query)
+	cv2.waitKey(0)
+	cv2.destroyAllWindows()
+
+
 	# Compare the images, produce numeric outputs
 
 
