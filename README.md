@@ -1,6 +1,8 @@
 # Peek  
 Peek is a proof-of-concept project that investigates how manufacturing quality assurance can be inspected using computer vision.
 
+![Control and query image feature matching](https://raw.githubusercontent.com/domantasjurkus/peek/master/img/splash.jpg)
+
 ### Requirements  
 * Python 2.7.13  
 * OpenCV 2.4.13.2 (built-in SIFT and SURF feature detection algorithms)  
@@ -22,6 +24,7 @@ The alignment step uses scale-invariant features (SIFT) for detection and matchi
 Image difference is (currently) computed by the net brightness difference. This approach is sensitive to misalignment, background and lighting variation and thus is likely to be updated in the future. Edge detection and difference was considered, but it also suffers from poor alignment.  
 
 ### Todos  
+`*` Scale both images not to run out of memory
 `*` Update warping to rotate the query image any number of degrees  
 `*` Smooth differnece in case alignment is not optimal  
 `*` Investigate other techniques (colour thresholding) for finding image difference  

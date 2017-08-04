@@ -114,7 +114,7 @@ def get_warped_image(img_control, img_query):
 
 if __name__ == "__main__":
 	img_control = cv2.imread("../img/control.jpg", 0)
-	img_query = cv2.imread("../img/query1.jpg", 0)
+	img_query = cv2.imread("../img/query_paper.jpg", 0)
 	
 	warped_image = get_warped_image(img_control, img_query)
 	cv2.imwrite("../img/aligned_paper.jpg", warped_image);
