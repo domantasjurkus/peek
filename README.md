@@ -1,35 +1,30 @@
-# CS Sideproject - Manufacturing Quality Assurance
+# Peek  
+Peek is a proof-of-concept project that investigates how manufacturing quality assurance can be inspected using computer vision.
 
-The purpouse of this project is to explore how product manufacturing quality can be ensured. To keep the project withing a manageable scope, the quality of Cooper Software coasters shall be inspected. After an initial investigation into the possible technologies, two methods of carrying out the project emerged: using computer vision and/or machine learning.  
+### Requirements  
+* Python 2.7.13  
+* OpenCV 2.4.13.2 (built-in SIFT and SURF feature detection algorithms)  
 
-The computer vision approad can be found in `opencv`.  
-The machine learning approad is currently gitignored due to the large directory size.
+### Running Example  
+1. Clone this repo  
+2. Run `python main.py` from a command line - a sample control and query image will be compared, with a quality assurance score printed in the console.
 
-## Computer Vision approach
+### Approach  
+For an arbitrary product image, a quality confidence score is computed by the following steps:  
+1. Control and query images are loaded.  
+2. The query image is scaled, rotated and aligned to the control image.  
+3. Images are blurred and smoothed to minimise misalignment.  
+3. Both images are inspected for differences in shape and contour.  
+4. A final confidence score is produced following the observed differences.  
 
-This approach uses an older Opencv 2.4.13.2 (Python 2.7) version which has SIFT and SURF operators part of the core package.
+The alignment step uses scale-invariant features (SIFT) for detection and matching of similar regions between the two images, producing a transformation matrix that allows warping the query image in alignment with the control image. After comarison between SIFT and SURF matchers, no significant difference was apparent in choice of matching algorithm.  
 
-`*` Detect scale-invariant features (SIFT) of a sample control coaster and a target coaster  
-`*` Align both coasters  
-`*` Calculate edge difference  
+Image difference is (currently) computed by the net brightness difference. This approach is sensitive to misalignment, background and lighting variation and thus is likely to be updated in the future. Edge detection and difference was considered, but it also suffers from poor alignment.  
+
+### Todos  
+`*` Update warping to rotate the query image any number of degrees  
 `*` Smooth differnece in case alignment is not optimal  
-`*` Represent edge diference in a numerical format  
+`*` Investigate other techniques (colour thresholding) for finding image difference  
+`*` Add tests with good and bad query images  
 
-`+` Single test sample required  
-`+` Possibly generalisable to any arbitrary shape/product  
-`-` Alignment/rotation can be tricky/computationally expensive  
-
-
-#### Log `2017`
-`27 Jul`  
-Found a good example of SIFT, added it in `find_and_align`  
-
-`28 Jul`  
-Cleanup, move old scripts into `old`.  
-Tried comparing the SIFT and SURF matchers - no significant difference was apparent.  
-The query coaster is found in the query image - now need to crop out and align the coaster with the sample image.
-
-`30 Jul`  
-Updated `find_and_align` to warp the query coaster to be aligned with the control coaster. Current approach assumes that the angle is no bigger than a few degrees, otherwise the detected coasted may be flipped.
-
-Initial comparison using Canny edge detection picks up a lot of noise that is not actual 'damage' to the product. Will need to adjust the thresholds or consider another method of comparison
+Project by Domantas Jurkus
