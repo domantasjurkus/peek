@@ -58,7 +58,7 @@ def filter_matches(kp1, kp2, matches, ratio=0.75):
 	return p1, p2, kp_pairs
 
 
-def get_warped_image(img_control, img_query, corners):
+def compute_perspective(img_control, img_query, corners):
 	# Determine topleft,topright,bottomright,bottomleft corners
 	query_rectangle = util.get_corners(corners.reshape(4,2))
 	max_h, max_w = img_control.shape[:2]
@@ -73,16 +73,7 @@ def get_warped_image(img_control, img_query, corners):
 	return cv2.warpPerspective(img_query, transform_matrix, (max_w, max_h))
 
 
-def save_image(image, path="../aligned.jpg"):
-	cv2.imwrite(path, image);
-
-
-if __name__ == "__main__":
-	fn1 = "control.jpg"
-	fn2 = "rotated.jpg"
-	img_control = cv2.imread(fn1, 0)
-	img_query = cv2.imread(fn2, 0)
-
+def get_warped_image(img_control, img_query):
 	features = ["sift", "surf"]
 	feature_name = features[0]
 	detector, matcher = get_detector_and_matcher(feature_name)
@@ -121,11 +112,19 @@ if __name__ == "__main__":
 	# Draw matching keypoint pairs for debugging
 	draw.draw_traces(img_control, img_query, kp_pairs, corners, status)
 
-	warp = get_warped_image(img_control, img_query, corners)
-	cv2.imshow("image", warp)
+	warped = compute_perspective(img_control, img_query, corners)
+	return warped
 
-	# Save/Return the image to the caller
-	save_image(warp)
 
+if __name__ == "__main__":
+	fn1 = "control.jpg"
+	fn2 = "rotated.jpg"
+	img_control = cv2.imread(fn1, 0)
+	img_query = cv2.imread(fn2, 0)
+	
+	warped_image = get_warped_image(img_control, img_query)
+	#cv2.imwrite("../aligned.jpg", warped_image);
+
+	cv2.imshow("warped", warped_image)
 	cv2.waitKey(0)
 	cv2.destroyAllWindows()
