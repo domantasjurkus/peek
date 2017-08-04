@@ -24,7 +24,7 @@ The alignment step uses scale-invariant features (SIFT) for detection and matchi
 Image difference is (currently) computed by the net brightness difference. This approach is sensitive to misalignment, background and lighting variation and thus is likely to be updated in the future. Edge detection and difference was considered, but it also suffers from poor alignment.  
 
 ### Todos  
-`*` Scale both images not to run out of memory
+`*` Scale both images not to run out of memory  
 `*` Update warping to rotate the query image any number of degrees  
 `*` Smooth differnece in case alignment is not optimal  
 `*` Investigate other techniques (colour thresholding) for finding image difference  
