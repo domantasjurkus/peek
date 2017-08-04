@@ -1,3 +1,5 @@
 coasters/
 temp/
 tensorflow/
+**/*.pyc
+**/*.pyd
