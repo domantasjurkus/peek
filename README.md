@@ -1,7 +1,7 @@
 # Peek  
 Peek is a proof-of-concept project that investigates how manufacturing quality assurance can be inspected using computer vision.
 
-![Control and query image feature matching](https://raw.githubusercontent.com/domantasjurkus/peek/master/img/splash.jpg)
+![Control and query image feature matching](/img/splash.jpg?raw=true "Feature matching")
 
 ### Requirements  
 * Python 2.7.13  
