@@ -43,7 +43,6 @@ def get_detector_and_matcher(feature_name):
 		matcher = cv2.BFMatcher(norm)
 	return detector, matcher
 
-
 def filter_matches(kp1, kp2, matches, ratio=0.75):
 	# matched key points
 	mkp1, mkp2 = [], []
@@ -56,7 +55,6 @@ def filter_matches(kp1, kp2, matches, ratio=0.75):
 	p2 = np.float32([kp.pt for kp in mkp2])
 	kp_pairs = zip(mkp1, mkp2)
 	return p1, p2, kp_pairs
-
 
 def compute_perspective(img_control, img_query, corners):
 	# Determine topleft,topright,bottomright,bottomleft corners
@@ -71,7 +69,6 @@ def compute_perspective(img_control, img_query, corners):
 
 	transform_matrix = cv2.getPerspectiveTransform(query_rectangle, empty_array)
 	return cv2.warpPerspective(img_query, transform_matrix, (max_w, max_h))
-
 
 def get_warped_image(img_control, img_query):
 	features = ["sift", "surf"]
@@ -110,20 +107,17 @@ def get_warped_image(img_control, img_query):
 	corners = cv2.perspectiveTransform(blank_array, H)
 
 	# Draw matching keypoint pairs for debugging
-	#draw.draw_traces(img_control, img_query, kp_pairs, corners, status)
+	draw.draw_traces(img_control, img_query, kp_pairs, corners, status)
 
 	warped = compute_perspective(img_control, img_query, corners)
 	return warped
 
-
 if __name__ == "__main__":
-	control_path = "../img/control.jpg"
-	query_path = "../img/damaged_pen.jpg"
-	img_control = cv2.imread(control_path, 0)
-	img_query = cv2.imread(query_path, 0)
+	img_control = cv2.imread("../img/control.jpg", 0)
+	img_query = cv2.imread("../img/query1.jpg", 0)
 	
 	warped_image = get_warped_image(img_control, img_query)
-	#cv2.imwrite("../aligned.jpg", warped_image);
+	cv2.imwrite("../img/aligned_paper.jpg", warped_image);
 
 	cv2.imshow("warped", warped_image)
 	cv2.waitKey(0)
