@@ -25,6 +25,6 @@ Image difference is (currently) computed by the net brightness difference. This 
 
 ### Todos  
 `*` Update warping to rotate the query image any number of degrees  
-`*` Apply adaptice thresholding to minimise background noise
+`*` Look into applying adaptive/Otsu thresholding to minimise background noise
 
 Project by Domantas Jurkus

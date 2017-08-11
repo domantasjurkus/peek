@@ -40,6 +40,8 @@ def get_difference_image(img1, img2, show_images=False):
 
 	diff = get_absolute_image_difference(img1, img2)
 	cv2.threshold(diff, 50, 255, cv2.THRESH_BINARY, diff)
+	#cv2.adaptiveThreshold(diff, 255, adaptiveMethod=cv2.ADAPTIVE_THRESH_MEAN_C,
+	#	thresholdType=cv2.THRESH_BINARY_INV, blockSize=3, C=4, dst=diff) 
 
 	if show_images:
 		cv2.imshow("control", img1)
@@ -57,8 +59,6 @@ if __name__ == "__main__":
 	img1 = cv2.imread(img1_path, 0);
 	img2 = cv2.imread(img2_path, 0);
 
-	cv2.imshow("original", img1)
-	cv2.imshow("damaged", img2)
 	img_diff = get_difference_image(img1, img2, True)
 
 	damage_prob = get_quality_score(img_diff)
