@@ -21,8 +21,8 @@ def get_difference_image(img1, img2):
 	return diff
 
 if __name__ == "__main__":
-	img1_path = "../img/control.jpg"
-	img2_path = "../img/aligned_paper.jpg"
+	img1_path = "../img/sample_control.jpg"
+	img2_path = "../img/sample_aligned_damaged.jpg"
 	img1 = cv2.imread(img1_path, 0);
 	img2 = cv2.imread(img2_path, 0);
 

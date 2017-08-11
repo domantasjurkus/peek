@@ -12,7 +12,7 @@ import util
 import draw
 
 FLANN_INDEX_KDTREE = 1  # bug: flann enums are missing
-FLANN_INDEX_LSH    = 6
+FLANN_INDEX_LSH = 6
 
 def get_detector_and_matcher(feature_name):
 	chunks = feature_name.split("-")
@@ -70,7 +70,10 @@ def compute_perspective(img_control, img_query, corners):
 	transform_matrix = cv2.getPerspectiveTransform(query_rectangle, empty_array)
 	return cv2.warpPerspective(img_query, transform_matrix, (max_w, max_h))
 
-def get_warped_image(img_control, img_query):
+def get_warped_image(img_control, img_query, draw_traces=False):
+	img_control = resize(img_control)
+	img_query = resize(img_query)
+
 	features = ["sift", "surf"]
 	feature_name = features[0]
 	detector, matcher = get_detector_and_matcher(feature_name)
@@ -106,18 +109,38 @@ def get_warped_image(img_control, img_query):
 	blank_array = np.float32([[0,0], [w1,0], [w1,h1], [0,h1]]).reshape(2,-1,2)
 	corners = cv2.perspectiveTransform(blank_array, H)
 
-	# Draw matching keypoint pairs for debugging
-	draw.draw_traces(img_control, img_query, kp_pairs, corners, status)
+	if draw_traces:
+		pass
+		# Draw matching keypoint pairs for debugging
+		# Traces can only be drawn on grayscale images
+		gray_control = cv2.cvtColor(img_control, cv2.COLOR_BGR2GRAY)
+		gray_query = cv2.cvtColor(img_query, cv2.COLOR_BGR2GRAY)
+		draw.draw_traces(gray_control, gray_query, kp_pairs, corners, status)
 
 	warped = compute_perspective(img_control, img_query, corners)
 	return warped
 
+def resize(img, maximum_small_edge=500):
+	h = img.shape[0]
+	w = img.shape[1]
+	small_edge = h if h < w else w
+
+	# If the image is already 500px or smaller on the shorter edge
+	if small_edge <= maximum_small_edge:
+		return img
+
+	scale_ratio = 1 / (small_edge*1.0 / maximum_small_edge)
+	return cv2.resize(img, (0,0), fx=scale_ratio, fy=scale_ratio)
+
 if __name__ == "__main__":
-	img_control = cv2.imread("../img/control.jpg", 0)
-	img_query = cv2.imread("../img/query_paper.jpg", 0)
+	img_control = cv2.imread("../img/sample_control.jpg")
+	img_query = cv2.imread("../img/sample_misaligned_damaged.jpg")
+
+	img_control = resize(img_control)
+	img_query = resize(img_query)
 	
-	warped_image = get_warped_image(img_control, img_query)
-	cv2.imwrite("../img/aligned_paper.jpg", warped_image);
+	warped_image = get_warped_image(img_control, img_query, True)
+	#cv2.imwrite("../img/sample_aligned_damaged.jpg", warped_image);
 
 	cv2.imshow("warped", warped_image)
 	cv2.waitKey(0)

@@ -12,8 +12,8 @@ def parse_args():
 '''
 
 def main():
-	control_path = "img/control.jpg"
-	query_path = "img/query2.jpg"
+	control_path = "img/sample_control.jpg"
+	query_path = "img/sample_query.jpg"
 	img_control = cv2.imread(control_path, 0)
 	img_query = cv2.imread(query_path, 0)
 
