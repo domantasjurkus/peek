@@ -32,7 +32,7 @@ def get_foreground_mask(img_query):
 	foreground_mask = subtractor.apply(img2, learningRate=0)
 	return foreground_mask
 
-def get_difference_image(img1, img2, show_difference=False):
+def get_difference_image(img1, img2, show_images=False):
 	#diff = get_foreground_mask(img2)
 	
 	cv2.GaussianBlur(img1, (5,5), 10, img1)
@@ -41,8 +41,12 @@ def get_difference_image(img1, img2, show_difference=False):
 	diff = get_absolute_image_difference(img1, img2)
 	cv2.threshold(diff, 50, 255, cv2.THRESH_BINARY, diff)
 
-	if show_difference:
+	if show_images:
+		cv2.imshow("control", img1)
+		cv2.imshow("query", img2)
 		cv2.imshow("difference", diff)
+		cv2.waitKey(0)
+		cv2.destroyAllWindows()
 
 	return diff
 
@@ -60,4 +64,3 @@ if __name__ == "__main__":
 	damage_prob = get_quality_score(img_diff)
 	print damage_prob
 
-	cv2.waitKey(0)

@@ -25,7 +25,7 @@ Image difference is (currently) computed by the net brightness difference. This 
 
 ### Todos  
 `*` Update warping to rotate the query image any number of degrees  
-`*` Investigate other techniques (background subtraction) for finding image difference  
-`*` Add tests with good and bad query images  
+`*` Update main executable to include command line arguments
+`*` Add tests with good and bad query image samples
 
 Project by Domantas Jurkus
