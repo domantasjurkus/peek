@@ -94,7 +94,7 @@ def get_warped_image(img_control, img_query, draw_traces=False):
 	
 	# Find the transformation homography
 	# H - 3x3 transformation matrix
-	# status - [0,1] vector of ???
+	# status - vector of [0,1] values (one-hots of something?)
 	# Basic idea: img1 = H*img2
 	H, status = cv2.findHomography(p1, p2, cv2.RANSAC, 5.0)
 	#print "%d / %d  inliers/matched" % (np.sum(status), len(status))
@@ -134,13 +134,14 @@ def resize(img, maximum_small_edge=500):
 
 if __name__ == "__main__":
 	img_control = cv2.imread("../img/sample_control.jpg")
-	img_query = cv2.imread("../img/sample_misaligned_damaged.jpg")
+	#img_query = cv2.imread("../img/sample_misaligned_undamaged.jpg")
+	img_query = cv2.imread("../img/background/05.jpg")
 
 	img_control = resize(img_control)
 	img_query = resize(img_query)
 	
 	warped_image = get_warped_image(img_control, img_query, True)
-	#cv2.imwrite("../img/sample_aligned_damaged.jpg", warped_image);
+	cv2.imwrite("../img/sample_aligned_undamaged.jpg", warped_image);
 
 	cv2.imshow("warped", warped_image)
 	cv2.waitKey(0)
