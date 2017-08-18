@@ -1,5 +1,5 @@
 import os
-from main import main
+from main import assess_quality
 
 def get_images_from_dir(directory):
 	images = []
@@ -9,18 +9,20 @@ def get_images_from_dir(directory):
 		images.append(directory+filename)
 	return images
 
-def testmain():
-	control_image = "test/control.jpg"
-	good_images = get_images_from_dir("test/good/")
-	bad_images = get_images_from_dir("test/bad/")
+def test_directory(directory="test/arbitrary_lighting/"):
+	control_image = directory + "control.jpg"
+	good_images = get_images_from_dir(directory + "good/")
+	bad_images = get_images_from_dir(directory + "bad/")
 
 	for g in good_images:
-		print "Control against %s:" % g,
-		main(control_image, g)
+		print "%s against %s:" % (control_image, g),
+		assess_quality(control_image, g)
 
 	for b in bad_images:
-		print "Control against %s:" % b,
-		main(control_image, b)
+		print "%s against %s:" % (control_image, b),
+		assess_quality(control_image, b, 1)
+	print
 
 if __name__ == "__main__":
-	testmain()
+	test_directory()
+	test_directory("test/controlled_lighting/")
