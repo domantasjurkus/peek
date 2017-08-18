@@ -20,7 +20,7 @@ def test_directory(directory="test/arbitrary_lighting/"):
 
 	for b in bad_images:
 		print "%s against %s:" % (control_image, b),
-		assess_quality(control_image, b, 1)
+		assess_quality(control_image, b)
 	print
 
 if __name__ == "__main__":

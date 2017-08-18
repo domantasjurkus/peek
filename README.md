@@ -19,13 +19,15 @@ For an arbitrary product image, a quality confidence score is computed by the fo
 3. Both images are inspected for differences in shape and contour.  
 4. A final confidence score is produced following the observed differences.  
 
-The alignment step uses scale-invariant features (SIFT) for detection and matching of similar regions between the two images, producing a transformation matrix that allows warping the query image in alignment with the control image. After comarison between SIFT and SURF matchers, no significant difference was apparent in choice of matching algorithm.  
+The alignment step uses a patented SIFT feature detection algorithm for matching similar regions between the two images, producing a transformation matrix that allows warping the query image in alignment with the control image.
 
 Image difference is (currently) computed by the net brightness difference. This approach is sensitive to misalignment, background and lighting variation and thus is likely to be updated in the future. Edge detection and difference was considered, but it also suffers from poor alignment.  
 
-### Todos  
+### Issues/Possible improvements  
+`*` Change feature detection algorithm from SIFT (patented) to BRISK or some other free alternative
+`*` Images are sensitive to lighting conditons
 `*` Update warping to rotate the query image any number of degrees  
-`*` Look into applying adaptive/Otsu thresholding to minimise background noise  
-`*` Make a folder for the used to put their own control and query images
+`*` Detect main geometric shape and remove background
+`*` Automatically assign the blur and threshold values (color histogram comparison?)
 
 Project by Domantas Jurkus
