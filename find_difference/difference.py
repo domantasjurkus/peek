@@ -37,8 +37,8 @@ if __name__ == "__main__":
 	img1_path = "../img/sample_control.jpg"
 	img2_path = "../img/sample_aligned_damaged.jpg"
 	#img2_path = "../img/sample_aligned_undamaged.jpg"
-	img1 = cv2.imread(img1_path, 0);
-	img2 = cv2.imread(img2_path, 0);
+	img1 = cv2.imread(img1_path);
+	img2 = cv2.imread(img2_path);
 
 	img_diff = get_difference_image(img1, img2, True)
 
