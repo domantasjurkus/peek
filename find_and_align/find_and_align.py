@@ -11,38 +11,6 @@ import sys, getopt
 import helper
 import draw
 
-FLANN_INDEX_KDTREE = 1  # bug: flann enums are missing
-FLANN_INDEX_LSH = 6
-
-def get_detector_and_matcher(feature_name):
-	chunks = feature_name.split("-")
-	if chunks[0] == "sift":
-		detector = cv2.SIFT()
-		norm = cv2.NORM_L2
-	elif chunks[0] == "surf":
-		detector = cv2.SURF(800)
-		norm = cv2.NORM_L2
-	elif chunks[0] == "orb":
-		detector = cv2.ORB(400)
-		norm = cv2.NORM_HAMMING
-	else:
-		detector = cv2.SIFT()
-		norm = cv2.NORM_L2
-
-	if "flann" in chunks:
-		if norm == cv2.NORM_L2:
-			flann_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
-		else:
-			flann_params= dict(algorithm = FLANN_INDEX_LSH,
-							   table_number = 6, # 12
-							   key_size = 12,     # 20
-							   multi_probe_level = 1) #2
-		# bug : need to pass empty dict (#1329)
-		matcher = cv2.FlannBasedMatcher(flann_params, {})
-	else:
-		matcher = cv2.BFMatcher(norm)
-	return detector, matcher
-
 def filter_matches(kp1, kp2, matches, ratio=0.75):
 	# matched key points
 	mkp1, mkp2 = [], []
@@ -55,6 +23,7 @@ def filter_matches(kp1, kp2, matches, ratio=0.75):
 	p2 = np.float32([kp.pt for kp in mkp2])
 	kp_pairs = zip(mkp1, mkp2)
 	return p1, p2, kp_pairs
+
 
 def compute_perspective(img_control, img_query, corners):
 	# Determine topleft,topright,bottomright,bottomleft corners
@@ -70,13 +39,14 @@ def compute_perspective(img_control, img_query, corners):
 	transform_matrix = cv2.getPerspectiveTransform(query_rectangle, empty_array)
 	return cv2.warpPerspective(img_query, transform_matrix, (max_w, max_h))
 
+
 def get_warped_image(img_control, img_query, draw_traces=False):
 	img_control = resize(img_control)
 	img_query = resize(img_query)
 
-	features = ["sift", "surf"]
-	feature_name = features[0]
-	detector, matcher = get_detector_and_matcher(feature_name)
+	# TODO: switch from patented SIFT to free-to-use BRISK
+	detector = cv2.SIFT()
+	matcher = cv2.BFMatcher(cv2.NORM_L2)
 
 	# Find keypoints and descriptors
 	kp1, desc1 = detector.detectAndCompute(img_control, None)
@@ -94,7 +64,7 @@ def get_warped_image(img_control, img_query, draw_traces=False):
 	
 	# Find the transformation homography
 	# H - 3x3 transformation matrix
-	# status - vector of [0,1] values (one-hots of something?)
+	# status - vector of [0,1] one-hot values
 	# Basic idea: img1 = H*img2
 	H, status = cv2.findHomography(p1, p2, cv2.RANSAC, 5.0)
 	#print "%d / %d  inliers/matched" % (np.sum(status), len(status))
@@ -139,6 +109,7 @@ if __name__ == "__main__":
 	query_path = "../img/sample_misaligned_damaged.jpg"
 	img_control = cv2.imread(control_path)
 	img_query = cv2.imread(query_path)
+
 	if img_control is None:
 		print "error: cannot load query image %s - are you sure the path is right?" % control_path
 		exit()
@@ -146,9 +117,6 @@ if __name__ == "__main__":
 	if img_query is None:
 		print "error: cannot load query image %s - are you sure the path is right?" % query_path
 		exit()
-
-	img_control = resize(img_control)
-	img_query = resize(img_query)
 	
 	warped_image = get_warped_image(img_control, img_query, True)
 	#cv2.imwrite("../img/sample_aligned_undamaged.jpg", warped_image);
