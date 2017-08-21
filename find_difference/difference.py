@@ -2,6 +2,9 @@ import os
 import cv2
 import numpy as np
 
+# Lower threshold - more damage+noise captured
+THRESHOLD_LIMIT = 50
+
 def get_quality_score(img_diff):
 	# Normalize: transform domain from [0,255] to [0,1]
 	pixel_count = len(img_diff)*len(img_diff[0])
@@ -18,9 +21,7 @@ def get_difference_image(img1, img2, show_images=False):
 	cv2.GaussianBlur(img2, (5,5), 10, img2)
 
 	diff = get_absolute_image_difference(img1, img2)
-	retval, thresholded = cv2.threshold(diff, 50, 255, cv2.THRESH_BINARY)
-	#cv2.adaptiveThreshold(diff, 255, adaptiveMethod=cv2.ADAPTIVE_THRESH_MEAN_C,
-	#	thresholdType=cv2.THRESH_BINARY_INV, blockSize=3, C=4, dst=diff) 
+	retval, thresholded = cv2.threshold(diff, THRESHOLD_LIMIT, 255, cv2.THRESH_BINARY)
 
 	if show_images:
 		cv2.imshow("control", img1)
