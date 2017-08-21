@@ -8,7 +8,7 @@ import numpy as np
 import cv2
 import sys, getopt
 
-import util
+import helper
 import draw
 
 FLANN_INDEX_KDTREE = 1  # bug: flann enums are missing
@@ -58,7 +58,7 @@ def filter_matches(kp1, kp2, matches, ratio=0.75):
 
 def compute_perspective(img_control, img_query, corners):
 	# Determine topleft,topright,bottomright,bottomleft corners
-	query_rectangle = util.get_corners(corners.reshape(4,2))
+	query_rectangle = helper.get_corners(corners.reshape(4,2))
 	max_h, max_w = img_control.shape[:2]
 
 	empty_array = np.array([
@@ -120,6 +120,7 @@ def get_warped_image(img_control, img_query, draw_traces=False):
 	warped = compute_perspective(img_control, img_query, corners)
 	return warped
 
+
 def resize(img, maximum_small_edge=500):
 	h = img.shape[0]
 	w = img.shape[1]
@@ -132,16 +133,25 @@ def resize(img, maximum_small_edge=500):
 	scale_ratio = 1 / (small_edge*1.0 / maximum_small_edge)
 	return cv2.resize(img, (0,0), fx=scale_ratio, fy=scale_ratio)
 
+
 if __name__ == "__main__":
-	img_control = cv2.imread("../img/sample_control.jpg")
-	#img_query = cv2.imread("../img/sample_misaligned_undamaged.jpg")
-	img_query = cv2.imread("../img/background/05.jpg")
+	control_path = "../img/sample_control.jpg"
+	query_path = "../img/sample_misaligned_damaged.jpg"
+	img_control = cv2.imread(control_path)
+	img_query = cv2.imread(query_path)
+	if img_control is None:
+		print "error: cannot load query image %s - are you sure the path is right?" % control_path
+		exit()
+
+	if img_query is None:
+		print "error: cannot load query image %s - are you sure the path is right?" % query_path
+		exit()
 
 	img_control = resize(img_control)
 	img_query = resize(img_query)
 	
 	warped_image = get_warped_image(img_control, img_query, True)
-	cv2.imwrite("../img/sample_aligned_undamaged.jpg", warped_image);
+	#cv2.imwrite("../img/sample_aligned_undamaged.jpg", warped_image);
 
 	cv2.imshow("warped", warped_image)
 	cv2.waitKey(0)
