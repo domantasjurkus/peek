@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-
-# Goal: 
-# Input: control and query image
-# Output: aligned query image
-
 import numpy as np
 import cv2
 import sys, getopt

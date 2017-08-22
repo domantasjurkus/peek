@@ -11,8 +11,8 @@ Peek is a proof-of-concept project that investigates how manufacturing quality a
 1. Clone this repo  
 2. Run `python main.py` from a command line - a sample control and query image will be compared, with a quality assurance score printed in the console.  
 
-Alignmnet example can by run with `python find_and_align/find_and_align.py`.  
-Difference example can by run with `python find_difference/difference.py`.  
+Alignmnet example can by run with `python src/align.py`.  
+Difference example can by run with `python src/difference.py`.  
 
 ### Approach  
 For an arbitrary product image, a quality confidence score is computed by the following steps:  

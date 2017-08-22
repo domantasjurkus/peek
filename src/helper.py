@@ -1,8 +1,9 @@
 import numpy as np
 
-# Input: array of 4 coordinates [x,y]
-# Returns: [top-left,top-right,bottom-right,bottom-left]
 def get_corners(points):
+	# Input: array of 4 coordinates [x,y]
+	# Returns: [top-left,top-right,bottom-right,bottom-left]
+
 	# rect = [top-left,top-right,bottom-right,bottom-left]
 	rect = np.zeros((4, 2), dtype="float32")
 
@@ -22,9 +23,10 @@ def get_corners(points):
 
 	return rect
 
-# Input: [top-left,top-right,bottom-right,bottom-left]
-# Output: (maximum_width,maximum_height)
+
 def get_width_height(quad_corners):
+	# Input: [top-left,top-right,bottom-right,bottom-left]
+	# Output: (maximum_width,maximum_height)
 	(tl, tr, br, bl) = quad_corners
 
 	width_top = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))

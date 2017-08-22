@@ -46,4 +46,3 @@ if __name__ == "__main__":
 
 	damage_prob = get_quality_score(img_diff)
 	print damage_prob
-

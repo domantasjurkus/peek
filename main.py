@@ -1,11 +1,9 @@
 import os, sys
 import cv2
-from find_and_align import find_and_align
-from find_difference import difference
-from util import resize
+from src import align, difference, util
 
 def parse_args():
-	if len(sys.argv) < 4:
+	if len(sys.argv) < 3:
 		control = "img/sample_control.jpg"
 		query = "img/query1.jpg"
 		show_images = 1
@@ -18,7 +16,11 @@ def parse_args():
 	else:
 		control = sys.argv[1]
 		query = sys.argv[2]
+
+	try:
 		show_images = sys.argv[3]
+	except:
+		show_images = 0
 	return (control, query, show_images)
 
 
@@ -33,10 +35,10 @@ def assess_quality(control_path, query_path, show_images=0):
 		print "error: cannot load query image %s - are you sure the path is right?" % query_path
 		exit()
 
-	img_control = resize(img_control)
-	img_control = resize(img_control)
+	img_control = util.resize(img_control)
+	img_control = util.resize(img_control)
 
-	img_query_aligned = find_and_align.get_warped_image(img_control, img_query)
+	img_query_aligned = align.get_warped_image(img_control, img_query)
 
 	img_diff = difference.get_difference_image(img_control, img_query_aligned, show_images)
 	quality_score = difference.get_quality_score(img_diff)
