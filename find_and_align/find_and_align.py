@@ -49,16 +49,16 @@ def get_warped_image(img_control, img_query, draw_traces=False):
 	matcher = cv2.BFMatcher(cv2.NORM_L2)
 
 	# Find keypoints and descriptors
-	kp1, desc1 = detector.detectAndCompute(img_control, None)
-	kp2, desc2 = detector.detectAndCompute(img_query, None)
+	keypoints1, descriptors1 = detector.detectAndCompute(img_control, None)
+	keypoints2, descriptors2 = detector.detectAndCompute(img_query, None)
 
 	# Find keypoints that match between the two images
-	raw_matches = matcher.knnMatch(desc1, trainDescriptors=desc2, k=2)
+	raw_matches = matcher.knnMatch(descriptors1, trainDescriptors=descriptors2, k=2)
 
 	# Filter out weak matches
-	p1, p2, kp_pairs = filter_matches(kp1, kp2, raw_matches)
+	points1, points2, kp_pairs = filter_matches(keypoints1, keypoints2, raw_matches)
 
-	if len(p1) < 4:
+	if len(points1) < 4:
 		print "Not enough strong matches found"
 		exit()
 	
@@ -66,7 +66,7 @@ def get_warped_image(img_control, img_query, draw_traces=False):
 	# H - 3x3 transformation matrix
 	# status - vector of [0,1] one-hot values
 	# Basic idea: img1 = H*img2
-	H, status = cv2.findHomography(p1, p2, cv2.RANSAC, 5.0)
+	H, status = cv2.findHomography(points1, points2, cv2.RANSAC, 5.0)
 	#print "%d / %d  inliers/matched" % (np.sum(status), len(status))
 
 	if H is None:
