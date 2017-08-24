@@ -5,7 +5,7 @@ from src import align, difference, util
 def parse_args():
 	if len(sys.argv) < 3:
 		control = "img/sample_control.jpg"
-		query = "img/query1.jpg"
+		query = "img/sample_misaligned_damaged.jpg"
 		show_images = 1
 		print "Usage: python2 main.py <control-image> <query-image> [show-images=0]"
 		print
@@ -13,10 +13,10 @@ def parse_args():
 		print "Control: %s" % control
 		print "Query: %s" % query
 		print "Quality Score: ..."
-	else:
-		control = sys.argv[1]
-		query = sys.argv[2]
+		return (control, query, show_images)
 
+	control = sys.argv[1]
+	query = sys.argv[2]
 	try:
 		show_images = sys.argv[3]
 	except:

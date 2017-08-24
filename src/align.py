@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-import sys, getopt
+import sys, os
 
 import helper
 import draw
@@ -30,15 +30,18 @@ def compute_perspective(img_control, img_query, corners):
 		[max_w-1, max_h-1],
 		[0, max_h-1]], dtype="float32")
 
-	transform_matrix = cv2.getPerspectiveTransform(query_rectangle, empty_array)
-	return cv2.warpPerspective(img_query, transform_matrix, (max_w, max_h))
+	# Calculates a perspective transform from four pairs of points
+	perspective_transform_matrix = cv2.getPerspectiveTransform(query_rectangle, empty_array)
+
+	# Transform query image based on matrix
+	return cv2.warpPerspective(img_query, perspective_transform_matrix, (max_w, max_h))
 
 
 def get_warped_image(img_control, img_query, draw_traces=False):
 	img_control = resize(img_control)
 	img_query = resize(img_query)
 
-	# TODO: switch from patented SIFT to free-to-use BRISK
+	# TODO: switch from patented SIFT to free-to-use BRISK (or other)
 	detector = cv2.SIFT()
 	matcher = cv2.BFMatcher(cv2.NORM_L2)
 
@@ -74,7 +77,6 @@ def get_warped_image(img_control, img_query, draw_traces=False):
 	corners = cv2.perspectiveTransform(blank_array, H)
 
 	if draw_traces:
-		pass
 		# Draw matching keypoint pairs for debugging
 		# Traces can only be drawn on grayscale images
 		gray_control = cv2.cvtColor(img_control, cv2.COLOR_BGR2GRAY)
@@ -99,8 +101,8 @@ def resize(img, maximum_small_edge=500):
 
 
 if __name__ == "__main__":
-	control_path = "../img/sample_control.jpg"
-	query_path = "../img/sample_misaligned_damaged.jpg"
+	control_path = "img/sample_control.jpg"
+	query_path = "img/sample_misaligned_damaged.jpg"
 	img_control = cv2.imread(control_path)
 	img_query = cv2.imread(query_path)
 
