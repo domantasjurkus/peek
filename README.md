@@ -7,10 +7,12 @@ Peek is a proof-of-concept project that investigates how manufacturing quality a
 * Python 2.7.13  
 * OpenCV 2.4.13.2 (built-in SIFT and SURF feature detection algorithms)  
 
-### Running Examples
-`python main.py` - align, subtract and produce score for sample images.  
-`python src/align.py` - alignment example.  
-`python src/difference.py` - difference example.  
+### Demo
+`python main.py` - run example of alignment and difference
+`python src/align.py` - alignment example  
+`python src/difference.py` - difference example  
+
+`python test.py` - run script on a number of examples under good and less good lighting conditions (ideally, the score would be ~100 for good images and ~90 for damages ones)
 
 ### Approach  
 For an arbitrary product image, a quality confidence score is computed by the following steps:  
