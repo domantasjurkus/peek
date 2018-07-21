@@ -14,6 +14,8 @@ Peek is a proof-of-concept project that investigates how manufacturing quality a
 
 `python test.py` - run script on a number of examples under good and less good lighting conditions (ideally, the score would be ~100 for good images and ~90 for damages ones)  
 
+![Damage detection](/img/splash2.png?raw=true "Feature matching")  
+
 ### Approach  
 For an arbitrary product image, a quality confidence score is computed by the following steps:  
 1. Control and query images are loaded (control image has to be cropped to the very edges of the product)  
