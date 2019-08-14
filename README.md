@@ -25,15 +25,13 @@ For an arbitrary product image, a quality confidence score is computed by the fo
 4. A final confidence score is output based on damage map  
 
 #### Assumptions  
-`*` Images should ideally be captured under similar lighting conditions  
-`*` The camera should be fixed 90 degrees vertically above the products for inspection  
-`*` The product is not rotated from the query image more than 45 degrees  
+- Images should ideally be captured under similar lighting conditions  
+- The camera should be fixed 90 degrees vertically above the products for inspection  
+- The product is not rotated from the query image more than 45 degrees  
 
 ### Nice-to-haves  
-`*` Automatically crop control image  
-`*` Change feature detection algorithm from SIFT (patented) to BRISK or some other free alternative  
-`*` Update warping to rotate the query image any number of degrees  
-`*` Detect main geometric shape of the product to remove background  
-`*` Automatically compute blur and threshold values (color histogram comparison?)  
-
-Project by Domantas Jurkus  
+- Automatically crop control image  
+- Change feature detection algorithm from SIFT (patented) to BRISK or some other free alternative  
+- Update warping to rotate the query image any number of degrees  
+- Detect main geometric shape of the product to remove background  
+- Automatically compute blur and threshold values (color histogram comparison?)  
